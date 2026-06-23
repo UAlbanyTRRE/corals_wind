@@ -1,6 +1,6 @@
 # =============================================================================
 # SAF (n=81): FE + ME ordinal models, residual-wind test, approximate mediation
-# Part of: Wind effects on coral bleaching severity (Lapenis & Jiang)
+# Part of: Wind effects on coral bleaching severity (Lapenis)
 # Language: R
 # Inputs : data/input/saf_synced_bleaching_wind_TC_zscored.csv
 # Outputs: data/output/

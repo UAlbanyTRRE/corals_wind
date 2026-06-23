@@ -1,6 +1,6 @@
 # =============================================================================
 # Transform GCBD bleaching severity (0.1-100% or text codes) into 3 ordered classes (5/30/75)
-# Part of: Wind effects on coral bleaching severity (Lapenis & Jiang)
+# Part of: Wind effects on coral bleaching severity (Lapenis)
 # Language: R
 # Inputs : data/input/gcbd_database.xlsx
 # Outputs: data/output/gcbd_with_aggregated_severity.csv

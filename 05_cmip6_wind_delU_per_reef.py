@@ -1,6 +1,6 @@
 # =============================================================================
 # CMIP6 projected mean-wind change (delta U) at every reef cell
-# Part of: Wind effects on coral bleaching severity (Lapenis & Jiang)
+# Part of: Wind effects on coral bleaching severity (Lapenis)
 # Language: Python 3 (designed for Google Colab; runs locally with minor edits)
 #
 # WHAT IT DOES

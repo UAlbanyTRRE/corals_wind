@@ -1,8 +1,8 @@
 # =============================================================================
 # GLO ordinal logistic regression (FE & ME); wind x turbidity interaction
-# Part of: Wind effects on coral bleaching severity (Lapenis & Jiang)
+# Part of: Wind effects on coral bleaching severity (Lapenis)
 # Language: R
-# Inputs : data/input/glo_bleaching_variables_PCA.xlsx
+# Inputs : data/input/Supplementary_Data_S1_S2.xlsx (sheet "Table S2 - GLO", header on row 2)
 # Outputs: data/output/OLR_FE_ME_windXturbidity/
 # Depends: dplyr, forcats, ggplot2, janitor, openxlsx, ordinal, purrr, readxl, stringr, tibble, tidyr
 # Notes  : Paths are set in the CONFIG/USER-SETTINGS block below; place input
@@ -24,16 +24,15 @@
 
 # -------------------------
 # User settings
-
 # -------------------------
-# GLO analysis table. This is the same GLO data as sheet "Table S2 - GLO" of the
-# published Supplementary_Data_S1_S2.xlsx (read by 11_glo_selection_robustness.R),
-# exported here as a single flat sheet for convenience. Both are in the data deposit.
-input_file <- "data/input/glo_bleaching_variables_PCA.xlsx"
-sheet_name <- 1
-out_dir <- "data/output/OLR_FE_ME_windXturbidity"
+# GLO analysis table = sheet "Table S2 - GLO" of the deposited
+# Supplementary_Data_S1_S2.xlsx (the same file read by 11_glo_selection_robustness.R).
+input_file <- "data/input/Supplementary_Data_S1_S2.xlsx"
+sheet_name <- "Table S2 - GLO"
+glo_skip   <- 1                 # header sits on the 2nd row of that sheet
+out_dir    <- "data/output/OLR_FE_ME_windXturbidity"
 dir.create(out_dir, showWarnings = FALSE, recursive = TRUE)
-out_xlsx <- file.path(out_dir, "OLR_FE_ME_m6_windXTurbidity_ONE_WORKBOOK.xlsx")
+out_xlsx   <- file.path(out_dir, "OLR_FE_ME_m6_windXTurbidity_ONE_WORKBOOK.xlsx")
 delta_cutoff <- 2
 max_models_to_plot <- 3
 # Mixed-effects settings
@@ -44,7 +43,6 @@ random_group <- "realm_name"
 
 # -------------------------
 # Packages
-
 # -------------------------
 pkgs <- c(
   "readxl","dplyr","tidyr","purrr","stringr","ordinal","ggplot2",
@@ -75,7 +73,6 @@ library(janitor)
 
 # -------------------------
 # Helpers
-
 # -------------------------
 clean_sheet_base <- function(x) {
   x <- gsub("[:\\\\/\\?\\*\\[\\]]", "_", x)
@@ -181,7 +178,6 @@ coef_table_ordinal <- function(model) {
 
 # -------------------------
 # FE-only prediction helpers
-
 # -------------------------
 compute_eta_manual <- function(model, newdata) {
   tt <- tryCatch(stats::terms(model), error = function(e) NULL)
@@ -275,7 +271,6 @@ save_forest_plot <- function(model, title, out_path) {
 
 # -------------------------
 # Formula builder: m = 6 only, wind:turbidity only
-
 # -------------------------
 build_formulas_m6_windXTurbidity <- function(response, wind_set, tc_set, tsa_set, other_pool) {
   stopifnot(length(other_pool) == 6)
@@ -320,9 +315,8 @@ add_random_intercept <- function(formula_obj, group_var = "realm_name") {
 
 # -------------------------
 # Load and prepare data
-
 # -------------------------
-raw <- readxl::read_excel(input_file, sheet = sheet_name) %>% janitor::clean_names()
+raw <- readxl::read_excel(input_file, sheet = sheet_name, skip = glo_skip) %>% janitor::clean_names()
 required_cols_base <- c(
   "bleaching_categorical",
   "realm_name",
@@ -432,7 +426,6 @@ if (run_me_models) {
 
 # -------------------------
 # Simple ME diagnostic model
-
 # -------------------------
 simple_me_result <- NULL
 if (run_me_models && !is.null(df_scaled_me)) {
@@ -442,7 +435,6 @@ if (run_me_models && !is.null(df_scaled_me)) {
 
 # -------------------------
 # Predictor sets
-
 # -------------------------
 wind_set <- c("wind_mean_6m","wind_mean_12m","wind_mean_1993_2020")
 tc_set   <- c("tcpower_6m_400km","tcpower_12m_400km","tcpower_1993_2020_400km")
@@ -452,7 +444,6 @@ other_pool <- c("latitude","lon_sin","lon_cos","distance_to_shore","exposure","t
 
 # -------------------------
 # Universe evaluator
-
 # -------------------------
 evaluate_model_universe <- function(formulas, formula_meta, data, scenario_label,
                                     model_type = c("FE", "ME"),
@@ -636,7 +627,6 @@ evaluate_model_universe <- function(formulas, formula_meta, data, scenario_label
 
 # -------------------------
 # Workbook writer
-
 # -------------------------
 write_universe_to_workbook <- function(wb, scenario_label, res) {
   base <- clean_sheet_base(scenario_label)
@@ -691,7 +681,6 @@ write_universe_to_workbook <- function(wb, scenario_label, res) {
 
 # -------------------------
 # Run analysis
-
 # -------------------------
 wb <- openxlsx::createWorkbook()
 # diagnostics sheet

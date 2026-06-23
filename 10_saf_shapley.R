@@ -2,11 +2,11 @@
 # SAF Shapley decomposition of McFadden R-squared
 # Thermal / Depth / Wind predictor groups
 #
-# Part of : Wind effects on coral bleaching severity (Lapenis & Jiang)
+# Part of : Wind effects on coral bleaching severity (Lapenis)
 # Language: R
-# Input   : data/input/saf_synced_bleaching_wind_TC_zscored.csv
+# Input   : data/input/Supplementary_Data_S1_S2.xlsx (sheet "Table S1 - SAF", header on row 2)
 # Output  : data/output/saf_shapley_results.xlsx
-# Depends : readr, ordinal, writexl
+# Depends : readxl, ordinal, writexl
 #
 # Purpose
 # -------
@@ -20,14 +20,15 @@
 # Reproducibility check
 # ---------------------
 # The script prints the reproduced Wind share of McFadden R-squared at the end.
-# The expected value is approximately 18%. The script flags the run as PASS if
-# the reproduced value falls within EXPECTED_TOL percentage points of 18%.
+# The expected value is approximately 25% for the SAF dataset. The script flags
+# the run as PASS if the reproduced value falls within EXPECTED_TOL percentage
+# points of that value. (The GLO dataset wind share is ~18%; see 06_glo_shapley_mundlak.R.)
 #
 # Run from the repository root.
 # =============================================================================
 
 ## ---- packages ----
-pkgs <- c("readr", "ordinal", "writexl")
+pkgs <- c("readxl", "ordinal", "writexl")
 missing_pkgs <- pkgs[!vapply(pkgs, requireNamespace, logical(1), quietly = TRUE)]
 if (length(missing_pkgs) > 0) {
   stop(
@@ -39,10 +40,12 @@ if (length(missing_pkgs) > 0) {
 invisible(lapply(pkgs, require, character.only = TRUE))
 
 ## ---- configuration ----
-SAF_FILE <- "data/input/saf_synced_bleaching_wind_TC_zscored.csv"
-OUT_FILE <- "data/output/saf_shapley_results.xlsx"
-OUTCOME  <- "Y_nanless"          # ordinal bleaching severity, expected 0..4
-EXPECTED_WIND_PCT <- 18           # reported approximate Wind share, percent
+SAF_FILE  <- "data/input/Supplementary_Data_S1_S2.xlsx"
+SAF_SHEET <- "Table S1 - SAF"
+SAF_SKIP  <- 1                    # header sits on the 2nd row of that sheet
+OUT_FILE  <- "data/output/saf_shapley_results.xlsx"
+OUTCOME   <- "Bleaching_prevalence"  # ordinal bleaching severity, 0..4
+EXPECTED_WIND_PCT <- 25           # SAF Wind share of McFadden R2, percent
 EXPECTED_TOL      <- 3            # pass if within +/- 3 percentage points
 
 ## ---- small utilities ----
@@ -87,7 +90,7 @@ make_rhs <- function(terms) {
   if (length(terms) == 0) "1" else paste(terms, collapse = " + ")
 }
 
-subset_key <- function(S) paste(sort(S), collapse = "|")
+subset_key <- function(S) if (length(S) == 0) "(null)" else paste(sort(S), collapse = "|")
 
 shapley_decompose <- function(groups, base_terms, data, ll_null) {
   keys <- names(groups)
@@ -147,7 +150,7 @@ if (!file.exists(SAF_FILE)) {
   )
 }
 
-d <- as.data.frame(readr::read_csv(SAF_FILE, show_col_types = FALSE))
+d <- as.data.frame(readxl::read_excel(SAF_FILE, sheet = SAF_SHEET, skip = SAF_SKIP))
 nm <- names(d)
 
 if (!(OUTCOME %in% nm)) {
@@ -156,12 +159,12 @@ if (!(OUTCOME %in% nm)) {
 
 ## ---- resilient column resolution ----
 # Candidate names mirror earlier SAF scripts and common sanitized variants.
-DEPTH <- pick(nm, c("depths", "Depth", "RAW_depths"), "Depth")
-ROTC  <- pick(nm, c("ROTC_.SS.", "ROTCSS", "RAW_ROTC_.SS."), "ROTC")
-AC1   <- pick(nm, c("Acute1...10", "Acute1...59", "RAW_Acute1"), "Acute1")
-DHW30 <- pick(nm, c("DHW_.l30.", "DHW30", "RAW_DHW_.l30."), "DHW30")
-DTR30 <- pick(nm, c("DTR_.30.", "DTR30", "RAW_DTR_.30."), "DTR30")
-TT    <- pick(nm, c("TT...12", "TT...84", "RAW_TT"), "TT")
+DEPTH <- pick(nm, c("Depth", "depths", "RAW_depths"), "Depth")
+ROTC  <- pick(nm, c("ROTC", "ROTC_.SS.", "ROTCSS", "RAW_ROTC_.SS."), "ROTC")
+AC1   <- pick(nm, c("Acute_1", "Acute1...10", "Acute1...59", "RAW_Acute1"), "Acute1")
+DHW30 <- pick(nm, c("DHW_30", "DHW_.l30.", "DHW30", "RAW_DHW_.l30."), "DHW30")
+DTR30 <- pick(nm, c("DTR_30", "DTR_.30.", "DTR30", "RAW_DTR_.30."), "DTR30")
+TT    <- pick(nm, c("TT", "TT...12", "TT...84", "RAW_TT"), "TT")
 WIND  <- pick(nm, c("Wind_12m_mean_z", "Wind_12m_mean_z."), "Wind")
 
 resolved_columns <- data.frame(

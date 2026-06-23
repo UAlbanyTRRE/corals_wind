@@ -1,8 +1,8 @@
 # =============================================================================
 # GLO Shapley decomposition of McFadden R-squared (4 groups) + Mundlak within-region wind
-# Part of: Wind effects on coral bleaching severity (Lapenis & Jiang)
+# Part of: Wind effects on coral bleaching severity (Lapenis)
 # Language: R
-# Inputs : data/input/glo_bleaching_variables_PCA.xlsx
+# Inputs : data/input/Supplementary_Data_S1_S2.xlsx (sheet "Table S2 - GLO", header on row 2)
 # Outputs: data/output/glo_shapley_mundlak_results.xlsx
 # Depends: readxl, writexl, ordinal
 # Notes  : Paths are set in the CONFIG/USER-SETTINGS block below; place input
@@ -38,10 +38,14 @@ if (length(missing_pkgs) > 0)
        call. = FALSE)
 invisible(lapply(pkgs,require,character.only=TRUE))
 ## ---- CONFIG ----
-# GLO analysis table = same data as sheet "Table S2 - GLO" of the published
-# Supplementary_Data_S1_S2.xlsx (read by 11), exported as a single flat sheet.
-GLO_FILE <- "data/input/glo_bleaching_variables_PCA.xlsx"
-OUT_FILE <- "data/output/glo_shapley_mundlak_results.xlsx"
+# GLO analysis table = sheet "Table S2 - GLO" of the deposited
+# Supplementary_Data_S1_S2.xlsx (the same file read by 11_glo_selection_robustness.R).
+GLO_FILE  <- "data/input/Supplementary_Data_S1_S2.xlsx"
+GLO_SHEET <- "Table S2 - GLO"
+GLO_SKIP  <- 1            # header sits on the 2nd row of that sheet
+OUT_DIR   <- "data/output"
+dir.create(OUT_DIR, showWarnings = FALSE, recursive = TRUE)
+OUT_FILE  <- file.path(OUT_DIR, "glo_shapley_mundlak_results.xlsx")
 MIN_REGION <- 10          # drop regions smaller than this for WITHIN-region fits
 GROUPS <- list(
   Thermal = c("tsa_dhw","sst_pc1","sst_pc2","sst_pc3"),
@@ -51,7 +55,7 @@ GROUPS <- list(
 ALLP   <- unique(unlist(GROUPS))
 CTRL   <- setdiff(ALLP, "wind_mean_6m")     # controls for the wind-coefficient fits
 ## ---- load, basin, response, scale ----
-g <- as.data.frame(readxl::read_excel(GLO_FILE))
+g <- as.data.frame(readxl::read_excel(GLO_FILE, sheet = GLO_SHEET, skip = GLO_SKIP))
 basin_of <- function(r) ifelse(grepl("Atlantic",r),"Atlantic",
                         ifelse(r=="Western Indo-Pacific","Indian","Pacific"))
 g$basin <- basin_of(g$realm_name)
@@ -64,6 +68,18 @@ cat(sprintf("n=%d | basins: %s\n", nrow(g),
             paste(names(table(g$basin)),table(g$basin),collapse=", ")))
 ## ---- helpers ----
 ll_of <- function(rhs,data){
+  rhs <- trimws(rhs)
+  # Null / intercept-only model: compute the ordinal null log-likelihood
+  # analytically from the class proportions. For a proportional-odds model the
+  # intercept-only logLik is the threshold-only baseline sum(n_k * log(p_k)),
+  # which is the standard McFadden denominator. This avoids a fragile
+  # clm(y ~ 1) fit that errors in some 'ordinal' versions and would otherwise
+  # return NA and blank the whole Shapley decomposition.
+  if (rhs == "" || rhs == "1") {
+    tab <- table(data$y)
+    p   <- tab / sum(tab)
+    return(sum(tab * log(p)))
+  }
   m <- tryCatch(ordinal::clm(stats::as.formula(paste("y ~",rhs)),data=data,link="logit"),
                 error=function(e) NULL)
   if(is.null(m)) NA_real_ else as.numeric(stats::logLik(m))
@@ -71,7 +87,7 @@ ll_of <- function(rhs,data){
 shapley <- function(groups, base_terms, data, ll_null){
   keys <- names(groups); m <- length(keys)
   subs <- unlist(lapply(0:m,function(r) combn(keys,r,simplify=FALSE)),recursive=FALSE)
-  K <- function(S) paste(sort(S),collapse="|")
+  K <- function(S) if (length(S) == 0) "<null>" else paste(sort(S),collapse="|")
   R <- setNames(numeric(length(subs)), sapply(subs,K))
   for(S in subs){
     rhs <- paste(c(base_terms, unlist(groups[S])), collapse="+"); if(rhs=="") rhs<-"1"

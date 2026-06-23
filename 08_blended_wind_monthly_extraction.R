@@ -1,6 +1,6 @@
 # =============================================================================
 # Monthly mean wind speed (1991-2010) interpolated to reef coordinates (NOAA blended winds)
-# Part of: Wind effects on coral bleaching severity (Lapenis & Jiang)
+# Part of: Wind effects on coral bleaching severity (Lapenis)
 # Language: R
 # Inputs : NOAA blended-wind daily field + reef coordinates (supplied by the caller)
 # Outputs: data/output/windspeed_1991_2010_monthly.xlsx
@@ -9,7 +9,7 @@
 #
 # WHAT THIS FILE IS
 #   A self-contained HELPER MODULE. Sourcing it only *defines* two functions and
-#   runs nothing, so source("R/08_...R") never errors. The heavy extraction is
+#   runs nothing, so source("08_...R") never errors. The heavy extraction is
 #   performed only when you call extract_monthly_mean_wind(...) with a daily
 #   NOAA blended-wind field that you have loaded (the field itself is a public
 #   NOAA product, not redistributed here; see the Data Availability statement).
@@ -19,7 +19,7 @@
 #   longitudes, dayofyear) and could not run standalone.
 #
 # USAGE
-#   source("R/08_blended_wind_monthly_extraction.R")
+#   source("08_blended_wind_monthly_extraction.R")
 #   # load your daily blended-wind field and reef table, then:
 #   extract_monthly_mean_wind(
 #     results_df  = reef_table,        # data.frame with LATITUDE, LONGITUDE

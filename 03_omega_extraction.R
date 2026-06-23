@@ -1,6 +1,6 @@
 # =============================================================================
 # Extract aragonite saturation (Omega) at 0/50/100 m onto reef cells (1-deg grid)
-# Part of: Wind effects on coral bleaching severity (Lapenis & Jiang)
+# Part of: Wind effects on coral bleaching severity (Lapenis)
 # Language: R
 # Inputs : data/input/longterm_climatology_PCA.xlsx, data/input/aragonite_saturation.nc
 # Outputs: data/output/climatology_PCA_with_omega.xlsx

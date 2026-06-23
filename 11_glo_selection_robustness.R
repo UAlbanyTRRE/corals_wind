@@ -1,6 +1,6 @@
 # =============================================================================
 # GLO robustness: co-cell non-independence and record aggregation
-# Part of: Wind effects on coral bleaching severity (Lapenis & Jiang)
+# Part of: Wind effects on coral bleaching severity (Lapenis)
 # Language: R
 # Inputs : data/input/Supplementary_Data_S1_S2.xlsx  (sheet "Table S2 - GLO")
 # Outputs: data/output/glo_robustness.xlsx
@@ -36,7 +36,7 @@ invisible(lapply(pkgs, require, character.only = TRUE))
 
 ## ---- CONFIG ----
 # Published Supplementary Data workbook. Sheet "Table S2 - GLO" holds the same
-# GLO variables that 01/06 read from the derived extract glo_bleaching_variables_PCA.xlsx.
+# GLO variables; 01/06 read this same sheet of the deposited Supplementary Data workbook.
 GLO_FILE <- "data/input/Supplementary_Data_S1_S2.xlsx"
 GLO_SHEET <- "Table S2 - GLO"
 GLO_SKIP  <- 1                       # header sits on the 2nd row of that sheet

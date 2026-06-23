@@ -1,6 +1,6 @@
 # =============================================================================
 # Box Upwelling-Diffusion (BUD) carbonate model; U6 normalization; full m/n/q grid
-# Part of: Wind effects on coral bleaching severity (Lapenis & Jiang)
+# Part of: Wind effects on coral bleaching severity (Lapenis)
 # Language: R
 # Inputs : (none - self-contained)
 # Outputs: data/output/box_diffusion_mnq_withFa_U6.xlsx

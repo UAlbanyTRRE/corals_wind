@@ -1,6 +1,6 @@
 # =============================================================================
 # Tropical-cyclone power (TCP/PDI) within 400 km via Holland radial-wind profile (IBTrACS v04r01)
-# Part of: Wind effects on coral bleaching severity (Lapenis & Jiang)
+# Part of: Wind effects on coral bleaching severity (Lapenis)
 # Language: R
 # Inputs : data/input/saf_event_coordinates_dates.xlsx, data/input/ibtracs.ALL.list.v04r01.csv
 # Outputs: data/output/tcp_pdi_400km_6m_12m_1993_2020.xlsx (+ TCpower attenuated-Rmax workbook)

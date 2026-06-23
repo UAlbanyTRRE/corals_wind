@@ -1,0 +1,11 @@
+# Python dependencies for 05_cmip6_wind_delU_per_reef.py
+xarray
+gcsfs
+zarr
+cftime
+pandas
+numpy
+matplotlib
+openpyxl
+pyarrow
+cartopy

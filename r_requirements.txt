@@ -1,0 +1,24 @@
+# R packages used across the analysis scripts (all CRAN).
+# Base/recommended packages (parallel, stats, methods) are not listed.
+# For an exact-reproducibility record, pin versions from your sessionInfo()
+# or capture the environment with renv::snapshot().
+data.table
+dplyr
+forcats
+geosphere
+ggplot2
+janitor
+lme4
+lubridate
+ncdf4
+openxlsx
+ordinal
+pbapply
+purrr
+readr
+readxl
+seacarb
+stringr
+tibble
+tidyr
+writexl
